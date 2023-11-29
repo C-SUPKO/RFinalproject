@@ -1,8 +1,13 @@
-
-eventdata<- read.csv("event_data.csv",
-                     header =FALSE)
+BTC <- read.csv("btc.csv",
+                header = FALSE)
+BTC<-BTC[!BTC$V5=="NaN",]
+BTC
+BTC<-BTC[-1,]
+colnames(BTC)[1]="timestamp"
+colnames(BTC)[5]="close"
+BTC$close<-as.numeric(BTC$close)
 USDC<- read.csv("usdc_price_data.csv",
-                       header = FALSE)
+                header = FALSE)
 colnames(USDC)[1] ="timestamp"
 colnames(USDC)[2] ="open"
 colnames(USDC)[3] ="high"
@@ -41,7 +46,7 @@ WLUNA$close <- as.numeric(WLUNA$close)
 WLUNA <- WLUNA[-1, ]
 
 DAI<- read.csv("dai_price_data.csv",
-              header = FALSE)
+               header = FALSE)
 colnames(DAI)[1] <- "timestamp"
 colnames(DAI)[2] <- "open"
 colnames(DAI)[3] <- "high"
@@ -60,7 +65,7 @@ colnames(PAX)[5] <- "close"
 PAX$close <- as.numeric(PAX$close)
 PAX <- PAX[-1, ]
 
-cryptoList <- list("USDC", "USDT", "WLUNA", "DAI", "PAX","USTC")
+cryptoList <- list("USDC", "USDT", "WLUNA", "DAI", "PAX","USTC","btc")
 
 
 calculate_volatility <- function(Filename,crypto_data) {
@@ -80,9 +85,10 @@ wlvol<-calculate_volatility("WLUNA",WLUNA)
 davol<-calculate_volatility("DAI",DAI)
 pavol<-calculate_volatility("PAX",PAX)
 tcvol<-calculate_volatility("USTC",USTC)
+btcvol<-calculate_volatility("BTC",BTC)
 
-volatilities <- c(dcvol, dtvol, wlvol, davol, pavol,tcvol)
-cryptos <- c("USDC", "USDT", "WLUNA", "DAI", "PAX","USTC")
+volatilities <- c(dcvol, dtvol, wlvol, davol, pavol,tcvol,btcvol)
+cryptos <- c("USDC", "USDT", "WLUNA", "DAI", "PAX","USTC","BTC")
 text(x = barplot(volatilities) - 0.2, y = volatilities + 0.005, labels = round(volatilities, 4), pos = 3)
 
 barplot(volatilities, names.arg = cryptos, col = "skyblue",
