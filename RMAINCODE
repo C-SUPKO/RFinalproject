@@ -1,0 +1,88 @@
+
+eventdata<- read.csv("event_data.csv",
+                     header =FALSE)
+USDC<- read.csv("usdc_price_data.csv",
+                       header = FALSE)
+colnames(USDC)[1] ="timestamp"
+colnames(USDC)[2] ="open"
+colnames(USDC)[3] ="high"
+colnames(USDC)[4] ="low"
+colnames(USDC)[5] ="close"
+USDC$close<-as.numeric(USDC$close)
+USDC <- USDC[-1, ]
+
+USDT<- read.csv("usdt_price_data.csv",
+                header = FALSE)
+colnames(USDT)[1] <- "timestamp"
+colnames(USDT)[2] <- "open"
+colnames(USDT)[3] <- "high"
+colnames(USDT)[4] <- "low"
+colnames(USDT)[5] <- "close"
+USDT$close <- as.numeric(USDT$close)
+USDT <- USDT[-1, ]
+
+USTC<- read.csv("ustc_price_data.csv",
+                header = FALSE)
+USTC <- USDC[-1, ]
+WLUNA<- read.csv("wluna_price_data.csv",
+                 header = FALSE)
+colnames(WLUNA)[1] <- "timestamp"
+colnames(WLUNA)[2] <- "open"
+colnames(WLUNA)[3] <- "high"
+colnames(WLUNA)[4] <- "low"
+colnames(WLUNA)[5] <- "close"
+WLUNA$close <- as.numeric(WLUNA$close)
+WLUNA <- WLUNA[-1, ]
+
+DAI<- read.csv("dai_price_data.csv",
+              header = FALSE)
+colnames(DAI)[1] <- "timestamp"
+colnames(DAI)[2] <- "open"
+colnames(DAI)[3] <- "high"
+colnames(DAI)[4] <- "low"
+colnames(DAI)[5] <- "close"
+DAI$close <- as.numeric(DAI$close)
+DAI <- DAI[-1, ]
+
+PAX<- read.csv("pax_price_data.csv",
+               header = FALSE)
+colnames(PAX)[1] <- "timestamp"
+colnames(PAX)[2] <- "open"
+colnames(PAX)[3] <- "high"
+colnames(PAX)[4] <- "low"
+colnames(PAX)[5] <- "close"
+PAX$close <- as.numeric(PAX$close)
+PAX <- PAX[-1, ]
+
+cryptoList <- list("USDC", "USDT", "WLUNA", "DAI", "PAX")
+
+
+calculate_volatility <- function(Filename,crypto_data) {
+  crypto_data <- crypto_data[order(crypto_data$timestamp), ]
+  crypto_data$daily_return <- c(NA, diff(log(crypto_data$close)))
+  
+  volatility <- sd(crypto_data$daily_return, na.rm = TRUE)
+  annualized_volatility <- volatility * sqrt(252)
+  cat("Daily volatility",Filename,": ", volatility, "\n")
+  cat("Annualized Volatility",Filename,": ", annualized_volatility, "\n")
+  return(annualized_volatility)
+  
+}
+dcvol<-calculate_volatility("USDC",USDC)
+dtvol<-calculate_volatility("USDT",USDT)
+wlvol<-calculate_volatility("WLUNA",WLUNA)
+davol<-calculate_volatility("DAI",DAI)
+pavol<-calculate_volatility("PAX",PAX)
+
+volatilities <- c(dcvol, dtvol, wlvol, davol, pavol)
+cryptos <- c("USDC", "USDT", "WLUNA", "DAI", "PAX")
+text(x = barplot(volatilities) - 0.2, y = volatilities + 0.005, labels = round(volatilities, 4), pos = 3)
+
+barplot(volatilities, names.arg = cryptos, col = "skyblue",
+        main = "Annualized Volatility Comparison",
+        ylab = "Annualized Volatility")
+
+
+
+
+
